@@ -1,0 +1,92 @@
+= Gaucheを使った簡易DTPツール
+
+=== 概要
+
+これは、それほどの品質を要求されな印刷物を簡単に作成するツールです。
+このツールは、wikiで原稿を書き、それをPDFに変換する事で印刷物を作成します。
+
+* wikiはGaucheで書かれた Wiliki[http://practical-scheme.net/wiliki/wiliki.cgi] にいくつかの機能を追加したものです。
+* PDF作成は wkihtmltopdf[http://code.google.com/p/wkhtmltopdf/] を使っています。
+
+<b>注意</b> Mac OS X (SnowLeopard)でしか確認していません。Linux等では日本語が上手くPDFにならないかもしれません。
+
+
+=== インストール
+
+Gauche(0.9以降), Apache(2.X)がインストールされていて Gaucheで書いたCGIが動かせる環境を前提としています。
+
+1. Wiliki[http://practical-scheme.net/wiliki/wiliki.cgi]をインストール
+1. git clone git://github.com/yuumi3/GaucheMinDTP.git
+1. cloneしたディレクトリー下の Wiliki/wiliki.scm, Wiliki/wiliki/* でインストールしたWilkiを置き換える
+1. cloneしたディレクトリー下の wiliki.cgi を CGI用ディレクトリーにコピー
+1. cloneしたディレクトリー下の wiliki.css, wiliki_dtp.css を CSS用ディレクトリーにコピー
+1. 環境に合わせ wiliki.cgi 内の make <wiliki> のパラメタ-を調整
+1. wkihtmltopdf[http://code.google.com/p/wkhtmltopdf/] <b>0.10.0RC1以降</b>のコマンドをインストール。
+   * Mac OS X でビルドしたい場合は http://code.google.com/p/wkhtmltopdf/wiki/compilation のコメントを参照して下さい。ビルドにはかなり時間がかかります。
+   * 私がビルドした Mac OS X (SnowLeopard)用のバイナリーは {ここ}[https://github.com/downloads/yuumi3/GaucheMinDTP/wkhtmltopdf] からダウンロードできます。
+1. cloneしたディレクトリー下の wiki2pdf/wiki2pdf.scm , wiki2pdf/toc.xsl を適当なディレクトリーにコピー。
+
+
+
+=== 使い方
+
+1. Wiliki を使って原稿を作成
+   * トップページは各ページへのリンクを入れた目次的なページにして下さい。
+1. wiki2pdf.scm <em>上で作ったページのURL</em> <em>出力されるPDFファイルのパス</em>
+
+
+=== Wilkiに追加した機能
+
+==== 1. サブセクション番号の自動付加
+
+ * 4 基本的な構文
+  ....
+ ** 字句構造
+  ....
+ ** リテラル
+  ....
+
+のように h1 が数字から始まる場合、下のように表示時に h2 には連番が付加されます
+
+  4 基本的な構文
+    ....
+  4.1 字句構造
+    ....
+  4.2 リテラル
+
+==== 2. 表の幅指定
+
+  || 10 || 20 || 70 ||
+  || 1  || +  || 足し算 || 
+  || 2  || -  || 引き算 ||
+
+のように表の一行目に指定した数値で td の幅を指定できます、上の例では
+
+ <table>
+   <th><td width="10%">1</td><td width="20%">+</td><td width="70%">足し算</td></th>
+   ...
+ </table>
+
+のような表になります。
+
+==== 3. 画像表示マクロ
+
+  [[$$img-file ImageFile.png]]
+
+imag-fileマクロはWilikiが動いているコンピュター上の画像ファイルを表示します。
+
+画像ファイルを置くディレクトリーは wiliki.cgi 内の make <wiliki> の <b>:image-path</b> で指定します。
+
+==== 4. 印刷用表示
+
+ http://server/cgi-bin/wiliki.cgi?PageName&a=1
+
+のように表示の際に <b>a=1</b> パラメータを付加すると Wilikiのメニュー等が非表示になり印刷用の表示になります。
+
+
+
+=== License
+
+このページから clone できるソースコード等は Wilikiと同じ <b>BSD License</b> です。ただし、wkihtmltopdf[http://code.google.com/p/wkhtmltopdf/] は BSD License ではありませんので注意して下さい。
+
+

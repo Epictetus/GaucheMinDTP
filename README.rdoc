@@ -75,7 +75,7 @@ Gauche(0.9以降), Apache(2.X)がインストールされていて Gaucheで書�
 
 imag-fileマクロはWilikiが動いているコンピュター上の画像ファイルを表示します。
 
-画像ファイルを置くディレクトリーは wiliki.cgi 内の make <wiliki> の <b>:image-path</b> で指定します。
+画像ファイルを置くディレクトリーに対応したURLのパスを wiliki.cgi 内の make <wiliki> の <b>:image-path</b> で指定します。
 
 ==== 4. 印刷用表示
 

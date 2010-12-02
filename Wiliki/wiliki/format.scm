@@ -267,9 +267,10 @@
 (define-method wiliki:format-page-body ((fmt  <wiliki-formatter>)
                                         (page <wiliki-page>)
                                         . opts)
-  `(,@(apply wiliki:format-page-header  page opts)
-    ,@(apply wiliki:format-page-content page opts)
-    ,@(apply wiliki:format-page-footer  page opts)))
+  `(,@(apply wiliki:format-page-header  fmt page opts)
+    ,@(apply wiliki:format-page-content fmt page opts)
+    ,@(apply wiliki:format-page-footer  fmt page opts)))
+
 (define-method wiliki:format-page-body ((page <wiliki-page>) . opts)
   (apply wiliki:format-page-body (the-formatter) page opts))
 

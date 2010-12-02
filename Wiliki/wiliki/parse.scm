@@ -258,16 +258,46 @@
               (fmt-line ctx (tree->string (expand-tab (token-value tok))) r))
         (cont tok ctx `(pre ,@(reverse! r))))))
 
+  ;; Section number header extention 
+  (define section-no #f)
+  (define sub-section-no 0)
+
+  (define (section-prefix str h-lev)
+    (cond ((= h-lev 3) (string-append " ▢ " str))
+	  ((= h-lev 1)
+	   (cond ((#/^\s*(\d+)/ str) =>
+		  (lambda(m) (set! section-no (string->number (m 1))) str))
+		 (else str)))
+	  ((and (= h-lev 2) section-no)
+	   (inc! sub-section-no)
+	   (format #f " ~d.~d ~a" section-no sub-section-no str))
+	  (else str)))
+
   ;; Heading
   (define (heading m ctx cont)
     (let* ((h-lev (min (h-level m) 5))
            (elm   (ref '(_ h2 h3 h4 h5 h6) h-lev))
            (hstr  (m 'after))
+	   (hstr  (section-prefix hstr h-lev))
            (new-ctx (acons elm hstr ctx)))
       (cont (next-token new-ctx)
             new-ctx
             `(,elm (@@ (hkey ,hstr)) ; keep this for header-id calculation
                    ,@(reverse! (fmt-line ctx hstr '()))))))
+  ;; Table width setter extension
+  (define (add-td-width tr-list)
+    (let1 width-list (map (lambda(e) (caddr e)) (cddar tr-list))
+	  (values 
+	   (fold (lambda(a r) (+ (string->number a) r)) 0 width-list)
+	   (map (lambda(tr)
+		  (cons* (car tr) 
+			 (cadr tr)
+			 (map (lambda(e width)
+				(match e  ((td (at class) . args)
+					   `(,td (,at ,class (width ,(string-append width "%")))
+						 ,@args))))
+			      (cddr tr) width-list)))
+		(cdr tr-list)))))
 
   ;; Table
   (define (table tok ctx cont)
@@ -275,9 +305,11 @@
                (r '()))
       (if (eq? (token-type tok) 'table)
         (loop (next-token ctx) (cons (table-row ctx (token-value tok)) r))
-        (cont tok ctx
-              `(table (@ (class "inbody") (border 1) (cellspacing 0))
-                      ,@(reverse! r))))))
+	(receive (total-width tr-list) (add-td-width (reverse! r))
+		 (cont tok ctx
+		       `(table (@ (class "inbody") (border 1) (cellspacing 0)
+				  (width ,(format #f "~d%" total-width)))
+			       ,@tr-list))))))
 
   (define (table-row ctx m)
     `(tr (@ (class "inbody"))

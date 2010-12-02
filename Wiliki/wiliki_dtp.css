@@ -148,3 +148,5 @@ span.tag-anchor {
   font-style: italic;
 }
 
+h1, hr { display: none; }
+.menu-links, .last-modified { display: none; }

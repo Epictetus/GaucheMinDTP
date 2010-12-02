@@ -224,9 +224,9 @@
      ;; never includes explicit HTML tags (strictly speaking, the content
      ;; may have HTML tag within verbatim block.  let's see if it becomes
      ;; a problem or not.)
-     ((or (and (string? content) (#/<a\s+href=[\"' ]?\s*http/i content))
-          (and (string? logmsg) (#/<a\s+href=[\"' ]?\s*http/i logmsg)))
-      (wiliki:redirect-page (ref (wiliki)'top-page)))
+     ;;((or (and (string? content) (#/<a\s+href=[\"' ]?\s*http/i content))
+     ;;     (and (string? logmsg) (#/<a\s+href=[\"' ]?\s*http/i logmsg)))
+     ;; (wiliki:redirect-page (ref (wiliki)'top-page)))
      ;; Another ad-hoc filter: some (probably automated) spammer put
      ;; the same string in content and logmsg
      ((and (not (equal? content ""))

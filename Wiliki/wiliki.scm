@@ -156,6 +156,22 @@
                           ,@(wiliki:format-wikiname pagename)))))]
         ))
 
+
+(define-wiliki-action p :read (pagename)
+  (cond [(wiliki:db-get pagename) => (cut wiliki:fmt-page
+					  (make <wiliki-formatter>
+					    :bracket       default-format-wikiname
+					    :time          default-format-time
+					    :head-elements wiliki:default-head-elements)
+					  <>)]
+        [else
+         (html-page
+          (make <wiliki-page>
+            :title (string-append ($$ "Nonexistent page: ") pagename)
+            :content `((p ,($$ "Create a new page: ")
+                          ,@(wiliki:format-wikiname pagename)))))]
+        ))
+
 (define-wiliki-action lv :read (pagename)
   (let ((page (wiliki:db-get pagename #f)))
     `(,(cgi-header
@@ -366,13 +382,13 @@
 (define (wiliki:default-page-header page opts)
   `(,@(wiliki:page-title page)
     (div (@ (align "right")) ,@(wiliki:breadcrumb-links page ":"))
-    (div (@ (align "right")) ,@(wiliki:menu-links page))
+    (div (@ (align "right") (class "menu-links")) ,@(wiliki:menu-links page))
     (hr)))
 
 (define (wiliki:default-page-footer page opts)
   (if (ref page 'mtime)
     `((hr)
-      (div (@ (align right))
+      (div (@ (align right) (class "last-modified"))
            ,($$ "Last modified : ")
            ,(wiliki:format-time (ref page 'mtime))))
     '()))
@@ -451,6 +467,7 @@
                  (a (@ (href ,(url "p=~a&c=n" (cv-out real-name)))) "?"))]))
       )
   )
+
 
 (wiliki:formatter
  (make <wiliki-formatter>

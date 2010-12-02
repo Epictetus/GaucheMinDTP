@@ -1,4 +1,4 @@
-#!/usr/bin/gosh
+#!/opt/local/bin/gosh
 
 (use wiliki)
 
@@ -32,6 +32,8 @@
 ;;    :style-sheet - If a path to the css is given, it is used as a
 ;;               style sheet.  #f to use the default style.
 ;;
+;;    :alter-style-sheet - alternative style sheet path.
+;;
 ;;    :charsets - specify assoc list of character encodings to be
 ;;               used to generate webpage.
 ;;
@@ -52,14 +54,16 @@
 (define (main args)
   (wiliki-main
    (make <wiliki>
-     :db-path "/home/shiro/data/wikidata.dbm"
+     :db-path "/opt/local/apache2/data/wiliki.dbm"
+     :log-file "../cgi-logs/wiliki.log"
      :top-page "WiLiKi"
      :title "MyWiliki"
-     :description "Shiro's Wiliki Site"
-     :style-sheet "wiliki.css"
+     :description "My Wiliki Site"
+     :style-sheet "/css/wiliki.css"
+     :alter-style-sheet "/css/wiliki_dtp.css"
      :language 'jp
-     :charsets '((jp . euc-jp) (en . euc-jp))
-     :image-urls '((#/^http:\/\/sourceforge.net\/sflogo/ allow))
+     :charsets '((jp . utf-8) (en . utf-8))
+     :image-path "/wiliki/images"
      :debug-level 0
      )))
 

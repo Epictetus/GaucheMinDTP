@@ -117,6 +117,12 @@
       (badimg))))
 
 ;;---------------------------------------------------------------
+;; $$img-file
+;;
+(define-reader-macro (img-file file-name)
+  `((div (img (@ (src ,(format "~a/~a" (ref (wiliki) 'image-path) file-name)))))))
+
+;;---------------------------------------------------------------
 ;; $$tag
 ;;
 

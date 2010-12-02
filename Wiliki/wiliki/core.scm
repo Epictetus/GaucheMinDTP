@@ -59,6 +59,7 @@
           wiliki:redirect-page
           wiliki:log-file-path
           wiliki:std-page
+	  wiliki:fmt-page
           
           wiliki:action-ref define-wiliki-action wiliki:run-action
 
@@ -118,6 +119,9 @@
    ;; style-sheet path
    (style-sheet :accessor style-sheet-of :init-keyword :style-sheet
                 :init-value #f)
+   ;; alter style-sheet path
+   (alter-style-sheet :accessor alter-style-sheet-of :init-keyword :alter-style-sheet
+                :init-value #f)
    ;; allowed image path patterns
    (image-urls  :accessor image-urls-of  :init-keyword :image-urls
                 :init-value ())
@@ -147,6 +151,10 @@
    (gettext-paths :accessor gettext-paths :init-keyword :gettext-paths
                   :init-value '())
 
+   ;; image directory path
+   (image-path  :accessor image-path-of  :init-keyword :image-path
+                :init-value "/images")
+
    ;; OBSOLETED: customize edit text area size
    ;; Use stylesheet to customize them!
    (textarea-rows :accessor textarea-rows-of :init-keyword :textarea-rows
@@ -167,10 +175,13 @@
      (lambda (param)
        (let ((pagename (get-page-name self param))
              (command  (cgi-get-parameter "c" param))
+             (alter-css  (cgi-get-parameter "a" param))
              (language (cgi-get-parameter "l" param :convert string->symbol)))
          (parameterize ((wiliki:lang (or language (ref self'language))))
            (cgi-output-character-encoding (wiliki:output-charset))
            (setup-textdomain self language)
+	   (if alter-css
+	       (set! (ref self'style-sheet) (ref self'alter-style-sheet)))
            (cond
             ;; command may #t if we're looking at the page named "c".
             ((wiliki:action-ref (if (string? command)
@@ -410,6 +421,16 @@
     :content-style-type  "text/css")
    (html-doctype :type :transitional)
    (wiliki:sxml->stree (apply wiliki:format-page page args))))
+
+;; format specific page
+(define (wiliki:fmt-page fmt page . args)
+  (list
+   (cgi-header
+    :content-type #`"text/html; charset=,(wiliki:output-charset)"
+    :content-style-type  "text/css")
+   (html-doctype :type :transitional)
+   (wiliki:sxml->stree (apply wiliki:format-page fmt page args))))
+
 
 ;; Returns URL of the wiliki, with given parameters.
 ;;  (wiliki:url) => the relative URL of wiliki cgi
